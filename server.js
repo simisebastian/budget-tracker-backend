@@ -1,7 +1,12 @@
-const express = require("express");
-const cors = require("cors");
+const express = require('express');
 const { Pool } = require('pg');
+const bcrypt = require('bcrypt');
+const app = express();
+const jwt = require('jsonwebtoken');
+const cors = require('cors'); 
 
+
+app.use(cors());
 const pool = new Pool({
   user: 'admin',
   host: 'localhost',
@@ -10,6 +15,7 @@ const pool = new Pool({
   port: 5432,
 });
 
+app.use(express.json());
 pool.connect((err) => {
   if (err) {
     console.error('Error connecting to PostgreSQL:', err);
@@ -17,27 +23,56 @@ pool.connect((err) => {
     console.log('Connected to PostgreSQL');
   }
 });
-const app = express();
 
-var corsOptions = {
-  origin: "http://localhost:8081"
-};
-
-app.use(cors(corsOptions));
-
-// parse requests of content-type - application/json
-app.use(express.json());
-
-// parse requests of content-type - application/x-www-form-urlencoded
-app.use(express.urlencoded({ extended: true }));
-
-// simple route
-app.get("/", (req, res) => {
-  res.json({ message: "Welcome to bezkoder application." });
+app.post('/api/register', async (req, res) => {
+  const { name, email, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const queryText = 'INSERT INTO "user" (name, email, password) VALUES ($1, $2, $3) RETURNING *';
+  const values = [name, email, hashedPassword];
+  pool.query(queryText, values, async (err, result) => {
+    try {
+      // const result = await pool.query(queryText, values);
+      res.status(201).json({ message: 'User registered successfully', user: result.rows[0] });
+    } catch (err) {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
 });
 
-// set port, listen for requests
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
+app.post('/api/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  const queryText = 'SELECT * FROM "user" WHERE email = $1';
+  const values = [email];
+
+  try {
+    const result = await pool.query(queryText, values);
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({ error: 'Invalid email or password' });
+    }
+
+    const user = result.rows[0];
+
+    // Compare the password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Invalid email or password' });
+    }
+
+    // Generate a JWT token
+    const token = jwt.sign({ id: user.id, email: user.email }, 'simi123xyz', { expiresIn: '1h' });
+
+    res.json({ message: 'Login successful', token });
+  } catch (err) {
+    console.error('Error executing query:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
