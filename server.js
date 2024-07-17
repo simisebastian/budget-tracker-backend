@@ -3,6 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');
 const incomeRoutes = require('./routes/incomeRoutes');
+const expenseRoutes = require('./routes/expenseRoutes');
 require('./db/initDB'); // Ensure the database and tables are initialized
 
 const app = express();
@@ -20,6 +21,7 @@ app.use((req, res, next) => {
 
 app.use('/api', authRoutes);
 app.use('/api', incomeRoutes);
+app.use('/api', expenseRoutes);
 
 // Start the server
 app.listen(3000, () => {
