@@ -6,5 +6,6 @@ const router = express.Router();
 router.get('/expenses/subCategories/:sourceId', authenticateJWT, expenseController.getExpenseSubSources);
 router.get('/expenses/categories', authenticateJWT, expenseController.getExpenseSources);   
 router.post('/expenses/add', authenticateJWT, expenseController.addExpense);
+router.get('/expenses', authenticateJWT, expenseController.getExpenses);
 
 module.exports = router;

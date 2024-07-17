@@ -33,6 +33,22 @@ const expenseController = {
     }
   },
 
+  async getExpenses(req, res) {
+    try {
+      const userId = req.user.id;
+      const expenses = await Expense.findByUserId(userId);
+      if (expenses.length === 0) {
+        res.status(200).json({ message: 'Expense array is empty', data: [] });
+      } else {
+        const totalAmount = expenses.reduce((acc, row) => acc + parseFloat(row.amount), 0);
+        res.status(200).json({ message: 'Expense data retrieved successfully', data: expenses, totalAmount });
+      }
+    } catch (err) {
+      console.error('Error querying database:', err);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  },
+
   async addExpense(req, res) {
     const { amount, category, subCategory, description, date } = req.body;
     const userId = req.user.id;
