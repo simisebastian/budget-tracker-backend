@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');
 const incomeRoutes = require('./routes/incomeRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
+const dailyDataRoutes = require('./routes/dailyData');
 require('./db/initDB'); // Ensure the database and tables are initialized
 
 const app = express();
@@ -22,6 +23,7 @@ app.use((req, res, next) => {
 app.use('/api', authRoutes);
 app.use('/api', incomeRoutes);
 app.use('/api', expenseRoutes);
+app.use('/api', dailyDataRoutes);
 
 // Start the server
 app.listen(3000, () => {
