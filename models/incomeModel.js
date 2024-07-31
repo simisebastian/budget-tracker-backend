@@ -16,12 +16,12 @@ const Income = {
     }
   },
 
-  async create(userId, sourceId, amount, date) {
+  async create(userId, sourceId, amount, date, accountType) {
     const client = await pool.connect();
     try {
       const result = await client.query(
-        'INSERT INTO income (user_id, source_id, amount, date) VALUES ($1, $2, $3, $4) RETURNING *',
-        [userId, sourceId, amount, date]
+        'INSERT INTO income (user_id, source_id, amount, date, account_type) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [userId, sourceId, amount, date, accountType]
       );
       return result.rows[0];
     } finally {

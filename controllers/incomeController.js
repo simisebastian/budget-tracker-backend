@@ -18,6 +18,18 @@ const incomeController = {
     }
   },
 
+  async addIncome(req, res) {
+    const { source, amount, date, account_type } = req.body;
+    const userId = req.user.id;
+    try {
+      const newIncome = await Income.create(userId, source, amount, date, account_type);
+      res.status(201).json({ message: 'Income added successfully', income: newIncome });
+    } catch (err) {
+      console.error('Error executing query:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  },
+
   async getIncomeSources(req, res) {
     try {
       const sources = await IncomeSource.findAll();
@@ -29,18 +41,6 @@ const incomeController = {
     } catch (err) {
       console.error('Error querying database:', err);
       res.status(500).json({ error: 'Internal server error' });
-    }
-  },
-
-  async addIncome(req, res) {
-    const { source, amount, date } = req.body;
-    const userId = req.user.id;
-    try {
-      const newIncome = await Income.create(userId, source, amount, date);
-      res.status(201).json({ message: 'Income added successfully', income: newIncome });
-    } catch (err) {
-      console.error('Error executing query:', err);
-      res.status(500).json({ error: 'Internal Server Error' });
     }
   }
 };

@@ -6,6 +6,9 @@ const incomeRoutes = require('./routes/incomeRoutes');
 const expenseRoutes = require('./routes/expenseRoutes');
 const dailyDataRoutes = require('./routes/dailyData');
 require('./db/initDB'); // Ensure the database and tables are initialized
+require('dotenv').config();
+
+const PORT = process.env.PORT;
 
 const app = express();
 
@@ -26,6 +29,6 @@ app.use('/api', expenseRoutes);
 app.use('/api', dailyDataRoutes);
 
 // Start the server
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+app.listen(PORT, () => {
+  console.log('Server is running on port ' + PORT);
 });

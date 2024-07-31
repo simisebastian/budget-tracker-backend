@@ -50,10 +50,10 @@ const expenseController = {
   },
 
   async addExpense(req, res) {
-    const { amount, category, subCategory, description, date } = req.body;
+    const { source, sub_source, name, amount, date, account_type } = req.body;
     const userId = req.user.id;
     try {
-      const newExpense = await Expense.create(userId, amount, category, subCategory, description, date);
+      const newExpense = await Expense.create(userId, source, sub_source, name, amount, date, account_type);
       res.status(201).json({ message: 'Expense added successfully', expense: newExpense });
     } catch (err) {
       console.error('Error executing query:', err);
